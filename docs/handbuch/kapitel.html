@@ -1,0 +1,446 @@
+<header>
+  <p class="eyebrow">disting NT · Plug-in · Sary-Shagan v{{VER}}</p>
+  <h1>Sary-Shagan – Handbuch</h1>
+  <p class="lede">Sary-Shagan ist ein Plattenhall nach Jon Dattorro für den Expert Sleepers disting NT: eine offene Portierung von Plateau (Valley Audio), bedient wie dessen Hardware-Nachfolger Mesa. Dieses Handbuch erklärt Installation, ersten Patch, Bedienung am NT und in VCV Rack, alle Parameter und sieben Rezepte.</p>
+  <div class="facts"><span>In L/R · Out L/R</span><span>Dattorro-Tank aus Plateau</span><span>4 Seiten × 3 Potis</span><span>Bipolare Filter vor und im Hall</span><span>Dry/Wet als Überblendung</span><span>Freeze · Clear</span><span>Tuned Mode, Size-CV 1 V/Okt.</span><span>10 CV-Eingänge + 2 Gates</span><span>Pre-delay bis 500 ms</span><span>{{NPAR}} Parameter</span><span>VCV-Modul 24 HP</span></div>
+  <span class="chip chip-now">Stand {{DATUM}} · v{{VER}} · VCV-Modul {{VCV}} · gebaut und in der Simulation geprüft; in VCV Rack und am NT noch nicht ausprobiert</span>
+</header>
+
+<!--KAPITEL id="ueberblick" gruppe="Einstieg" titel="Überblick"-->
+  <h3 id="was-es-ist">Was es ist</h3>
+  <p>Sary-Shagan ist ein Stereo-Hall mit dem Klang einer Hallplatte: dicht, glatt, mit langer, ruhig schwebender Fahne. Der Klang-Kern ist der von Plateau aus ValleyRackFree, Zeile für Zeile übernommen. Die Bedienung folgt Mesa, der Hardware, die 4ms und Valley Audio aus Plateau gemacht haben: drei Regler je Gruppe, ein Filter-Regler statt zweier Cuts, Dry/Wet als Überblendung, zehn CV-Eingänge. Dazu kommen Freeze, Clear und ein Tuned Mode, in dem der Hall zum gestimmten Resonator wird.</p>
+  <p>Sary-Shagan ist ein Plug-in für den disting NT. Dasselbe Plug-in läuft in VCV Rack in nt_emu oder als eigenes Modul der Marke 3F4 (3rdFloor4) in einem kleinen NT-Host. Was das VCV-Modul tut, tut also auch der NT. Oberfläche, Display und Menüs sind englisch.</p>
+  <h3 id="was-drin-ist">Was drin ist</h3>
+  <ul class="lst">
+    <li>Der Dattorro-Tank aus Plateau: vier Eingangs-Allpässe, zwei rückgekoppelte Schleifen mit modulierten Allpässen, Verzögerungen und Dämpfungsfiltern, sieben Abgriffe je Seite.</li>
+    <li>Vier Bedienseiten wie Mesas Reglergruppen: INPUT, SPACE, TONE, MOD, je drei Potis; Encoder R stellt den zuletzt bewegten Poti fein ein.</li>
+    <li>Ein bipolarer Filter vor dem Hall und einer im Tank: Mitte aus, nach rechts Low cut, nach links High cut.</li>
+    <li>Dry/Wet als Equal-Power-Überblendung, Input level von −inf bis +2,5 dB, weiche Ausgangsbegrenzung.</li>
+    <li>Freeze (halten oder umschalten) und Clear, auf Tasten und als Gate-Eingänge.</li>
+    <li>Tuned Mode: sehr kurze Tank-Zeiten über fünf Oktaven, Size-CV als Tonhöhen-CV mit 1 V/Okt.</li>
+    <li>Zehn CV-Eingänge mit ±5 V über den ganzen Regelweg, zum Regler addiert.</li>
+    <li>Eigenes Display: Werte als Balken mit CV-Marke, geschätzte Hallzeit, Tonhöhe des Tanks, LFO-Form als Bild, Hall-Pegel.</li>
+  </ul>
+  <h3 id="herkunft-und-abgrenzung">Herkunft und Abgrenzung</h3>
+  <div class="tbl"><table>
+    <tr><th>Merkmal</th><th>Plateau (VCV Rack)</th><th>Mesa (Eurorack)</th><th>Sary-Shagan</th></tr>
+    <tr><td>Hall-Algorithmus</td><td>Dattorro-Tank, double</td><td>Dattorro-Tank aus Plateau, 96 kHz</td><td>Plateaus Tank, float, bei der NT-Rate</td></tr>
+    <tr><td>Filter</td><td>je vier Regler Low/High cut vor und im Tank</td><td>je ein bipolarer Regler</td><td>je ein bipolarer Regler</td></tr>
+    <tr><td>Mischung</td><td>Dry und Wet getrennt</td><td>Dry/Wet</td><td>Dry/Wet, Equal Power</td></tr>
+    <tr><td>Freeze · Clear</td><td>Hold, Clear</td><td>Freeze (halten/umschalten), Clear</td><td>wie Mesa, plus Gates</td></tr>
+    <tr><td>Tuned</td><td>Tuned mode</td><td>Tuned Size, Size-CV als Tonhöhe</td><td>wie Mesa, 1 V/Okt.</td></tr>
+    <tr><td>Reverse</td><td>–</td><td>Reverse</td><td>– (siehe {{KAP:grenzen}})</td></tr>
+    <tr><td>CV</td><td>fast jeder Regler mit Abschwächer</td><td>10 CV-Eingänge, ±5 V</td><td>10 CV-Eingänge, ±5 V, frei zuweisbar</td></tr>
+  </table></div>
+  <p>Was Sary-Shagan anders macht als die beiden Vorbilder, steht in {{KAP:grenzen}}.</p>
+
+<!--KAPITEL id="installation" gruppe="Einstieg" titel="Installation"-->
+  <h3 id="installation-am-nt">Am NT</h3>
+  <ol class="lst">
+    <li><code>sary_shagan.o</code> auf die SD-Karte nach <code>/programs/plug-ins/</code> kopieren.</li>
+    <li>Karte zurück ins Modul, NT neu starten oder die Plug-ins neu einlesen lassen.</li>
+    <li>Im Algorithmus-Menü <b>Sary-Shagan</b> hinzufügen (Tags Effect, Reverb). Es hört auf Eingang 1 und 2 und mischt auf Ausgang 1 und 2.</li>
+  </ol>
+  <h3 id="installation-nt-emu">In VCV Rack (nt_emu)</h3>
+  <ol class="lst">
+    <li><code>sary_shagan.dll</code> nach <code>%LOCALAPPDATA%\Rack2\disting-nt-plugins\</code> kopieren.</li>
+    <li>Im Modul „NT Emulator“ das Plug-in laden und den Algorithmus hinzufügen.</li>
+  </ol>
+  <p>Die DLL ist für Windows gebaut. In nt_emu kommen Encoder-Drücke unzuverlässig an; dafür übernehmen Taste 1 und 2 deren Aufgaben ({{KAP:bedienung}}).</p>
+  <h3 id="als-vcv-modul">Als VCV-Modul (3F4)</h3>
+  <ol class="lst">
+    <li>Rack schließen, sonst ist die DLL gesperrt.</li>
+    <li>Ältere Fassung entfernen: Ordner <code>3F4-SaryShagan</code> und, falls noch da, <code>3F4-Grando</code> in <code>%LOCALAPPDATA%\Rack2\plugins-win-x64\</code> löschen.</li>
+    <li><code>3F4-SaryShagan-{{VCV}}-win-x64.zip</code> dort entpacken, sodass der Ordner <code>3F4-SaryShagan</code> mit <code>plugin.dll</code> und <code>plugin.json</code> direkt in <code>plugins-win-x64</code> liegt.</li>
+    <li>Rack starten. Im Modulbrowser unter Marke <b>3F4</b>: <b>Sary-Shagan</b> (24 HP).</li>
+  </ol>
+  <h3 id="namen-und-dateien">Namen und Dateien</h3>
+  <div class="tbl"><table>
+    <tr><th>Wo</th><th>Name</th><th>Datei / Ordner</th></tr>
+    <tr><td>disting NT</td><td><b>Sary-Shagan</b> im Algorithmus-Menü, Tags Effect, Reverb</td><td><code>sary_shagan.o</code> → <code>/programs/plug-ins/</code></td></tr>
+    <tr><td>nt_emu</td><td>wie am NT</td><td><code>sary_shagan.dll</code> → <code>Rack2\disting-nt-plugins\</code></td></tr>
+    <tr><td>VCV-Modul</td><td>Marke <b>3F4</b> → <b>Sary-Shagan</b></td><td><code>3F4-SaryShagan-{{VCV}}-win-x64.zip</code> → entpackt nach <code>Rack2\plugins-win-x64\3F4-SaryShagan</code></td></tr>
+    <tr><td>Quelltext</td><td>Repo <code>xof-112/sary-shagan</code></td><td>Bauen: <code>README.md</code> im Repo</td></tr>
+    <tr><td>Alte Namen</td><td>Arbeitsname <i>Grando</i> (bis v0.3)</td><td><code>grando.o</code>, <code>grando.dll</code>, Ordner <code>3F4-Grando</code> löschen. Presets und Patches mit Grando laden nicht mehr (neue Kennung).</td></tr>
+  </table></div>
+
+<!--KAPITEL id="erster-patch" gruppe="Einstieg" titel="Erster Patch"-->
+  <p>In fünf Minuten von trocken zu einer gefrorenen Fläche. Die Schritte gelten am NT und am VCV-Modul gleich; in Klammern das VCV-Panel.</p>
+  <ol class="lst">
+    <li>Sary-Shagan laden. Eine Stimme mit kurzen Tönen (Pluck, Perkussion) auf Eingang 1 (<b>IN L</b>), Ausgang 1 und 2 (<b>OUT L</b>, <b>OUT R</b>) abhören. Ab Werk hörst du trocken und Hall gleich laut, rund 5,6 s Hallzeit.</li>
+    <li>Am NT die Ausgänge auf <i>Replace</i> stellen (Seite <i>Routing</i>), sonst liegt das trockene Signal doppelt auf Ausgang 1. Im VCV-Modul ist nichts zu tun.</li>
+    <li><b>Poti C</b> (<b>SIZE</b>) und <b>Poti R</b> (<b>DECAY</b>) aufdrehen: Der Raum wird größer, die Fahne länger. Das Display zeigt unter Decay die geschätzte Hallzeit.</li>
+    <li><b>Encoder L</b> (<b>PAGE</b>) eine Raste nach rechts: Seite TONE. <b>Poti R</b> (<i>Reverb filter</i>) nach links dunkelt die Fahne ab.</li>
+    <li>Einen Akkord spielen und <b>Taste 3</b> (<b>FREEZE</b>) gedrückt halten: Der Hall steht. Loslassen, und er klingt aus.</li>
+    <li><b>Taste 4</b> (<b>CLEAR</b>) löscht den Hall sofort.</li>
+  </ol>
+  <p>Kommt nichts: <i>Dry/Wet</i> ganz links (nur trocken), <i>Input level</i> auf −inf, oder <i>Input L</i> zeigt auf einen Eingang ohne Signal (Seite <i>Routing</i>). Bleibt der Hall stehen, ist Freeze an (<code>FREEZE</code> in der Kopfzeile).</p>
+
+<!--KAPITEL id="bedienung" gruppe="Spielen" titel="Bedienung"-->
+  <p>Sary-Shagan hat eine eigene Oberfläche: vier Seiten zu je drei Potis, wie die Reglergruppen an Mesa. Encoder L blättert, Encoder R stellt fein ein, Taste 3 und 4 sind Freeze und Clear. Alle Parameter gibt es zusätzlich auf den Parameterseiten des NT.</p>
+  <h3 id="seiten">Die vier Seiten</h3>
+  <div class="tbl"><table>
+    <tr><th>Seite</th><th>Poti L</th><th>Poti C</th><th>Poti R</th></tr>
+    <tr><td>INPUT</td><td><i>Input level</i></td><td><i>Pre-delay</i></td><td>– (<i>Diffuse input</i> auf Encoder L drücken)</td></tr>
+    <tr><td>SPACE (Start)</td><td><i>Diffusion</i></td><td><i>Size</i></td><td><i>Decay</i></td></tr>
+    <tr><td>TONE</td><td><i>Input filter</i></td><td><i>Dry/Wet</i></td><td><i>Reverb filter</i></td></tr>
+    <tr><td>MOD</td><td><i>Mod depth</i></td><td><i>Mod rate</i></td><td><i>Mod shape</i></td></tr>
+  </table></div>
+  <h3 id="bedienelemente">Bedienelemente</h3>
+  <div class="tbl"><table>
+    <tr><th>Element</th><th>Am NT</th><th>In nt_emu</th><th>Am VCV-Modul</th></tr>
+    <tr><td>Poti L · C · R drehen</td><td>die drei Parameter der Seite</td><td>wie NT</td><td>DIFFUSION · SIZE · DECAY</td></tr>
+    <tr><td>Encoder L drehen</td><td>Seite wechseln</td><td>wie NT</td><td>PAGE, dazu ◀ ▶</td></tr>
+    <tr><td>Encoder L drücken</td><td><i>Diffuse input</i> an/aus</td><td>– (über das Menü)</td><td>PUSH DIFFUSE</td></tr>
+    <tr><td>Encoder R drehen</td><td>Feinabstimmung des zuletzt bewegten Potis</td><td>wie NT</td><td>FINE, dazu ◀ ▶</td></tr>
+    <tr><td>Encoder R drücken</td><td><i>Tuned</i> an/aus</td><td>Taste 2</td><td>PUSH TUNED</td></tr>
+    <tr><td>Taste 1</td><td>bleibt beim NT</td><td>kurz: nächste Seite; lang: Menü</td><td>–</td></tr>
+    <tr><td>Taste 2</td><td>bleibt beim NT</td><td><i>Tuned</i> an/aus</td><td>–</td></tr>
+    <tr><td>Taste 3</td><td><b>Freeze</b>: hält, solange gedrückt; mit <i>Freeze mode</i> = Latch schaltet sie um</td><td>schaltet immer um</td><td>FREEZE (leuchtet)</td></tr>
+    <tr><td>Taste 4</td><td><b>Clear</b></td><td>wirkt beim Loslassen</td><td>CLEAR (blitzt)</td></tr>
+    <tr><td>Parametermenü</td><td>Taste des NT</td><td>Taste 1 lang</td><td>MENU</td></tr>
+  </table></div>
+  <p>Drei Hinweise gelten überall. Potis holen ab: siehe unten. Ein Encoder-Druck zählt nur ohne Drehen. In nt_emu kommen Tasten erst beim Loslassen an, deshalb gibt es dort kein Halten für Freeze.</p>
+  <h3 id="abholen">Potis holen ab</h3>
+  <p>Nach einem Seitenwechsel, nach dem Laden eines Presets oder wenn der Wert anderswo geändert wurde (Menü, CV-Mapping, MIDI), ändert ein Poti erst etwas, wenn es den aktuellen Wert überstreicht. Bis dahin zeigt ein senkrechter Strich im Balken, wo das Poti steht. So springt nichts.</p>
+  <h3 id="fine">Feinabstimmung mit Encoder R</h3>
+  <p>Encoder R stellt immer den Parameter, dessen Poti zuletzt etwas geschrieben hat; nach einem Seitenwechsel ist es der mittlere Poti der Seite. Die Fußzeile zeigt rechts, was gerade dran ist, etwa <code>FINE DECAY 50.0%</code>. Eine Raste ist 0,2 % des Wegs, bei <i>Pre-delay</i> 1 ms, bei <i>Input level</i> 0,1 dB.</p>
+  <h3 id="menue">Das Parametermenü</h3>
+  <p>Alle {{NPAR}} Parameter stehen auf sieben Seiten: <i>Input</i>, <i>Space</i>, <i>Tone</i>, <i>Modulation</i>, <i>Modes</i>, <i>CV inputs</i>, <i>Routing</i>. Am NT öffnet das Menü wie bei jedem Algorithmus. Am VCV-Modul öffnet <b>MENU</b> es im Display: Encoder L wählt den Parameter, Encoder L drücken springt zur nächsten Seite, Encoder R stellt den Wert (PUSH gehalten: ×10). <b>MENU</b> noch einmal schließt es.</p>
+
+<!--KAPITEL id="display" gruppe="Spielen" titel="Display lesen"-->
+  <p>Das Display ist das NT-Display, 256 × 64 Bildpunkte in 16 Graustufen; am VCV-Modul wird es Pixel für Pixel gezeigt. Die Bilder hier kommen aus dem Plug-in selbst.</p>
+  {{SCR:SPACE: Diffusion|Seite SPACE mit einer Decay-CV von +1 V: Die kleine Marke unter dem Decay-Balken zeigt, wo Regler + CV stehen; darunter die geschätzte Hallzeit.}}
+  <div class="tbl"><table>
+    <tr><th>Bereich</th><th>Zeigt</th></tr>
+    <tr><td>Kopfzeile links</td><td>die vier Seiten; die aktive ist hell hinterlegt</td></tr>
+    <tr><td>Kopfzeile rechts</td><td>Zustände: <code>CLIP</code> (Eingang über 9,6 V), <code>TUNED</code>, <code>FREEZE</code> oder <code>CLR</code> (Clear läuft)</td></tr>
+    <tr><td>Drei Spalten</td><td>je Poti Name, Wert und Balken. Filter-Balken laufen von der Mitte aus (Mitte = aus).</td></tr>
+    <tr><td>Marke unter dem Balken</td><td>wo Regler + CV tatsächlich stehen, wenn eine CV anliegt</td></tr>
+    <tr><td>Strich im Balken</td><td>wo ein noch nicht abgeholtes Poti steht</td></tr>
+    <tr><td>Unter Decay (SPACE)</td><td><code>RT 5.6 s</code>: geschätzte Hallzeit; <code>RT inf</code> bei Freeze</td></tr>
+    <tr><td>Unter Size (SPACE, Tuned)</td><td>Tonhöhe des Tanks in Hz mit nächstem Notennamen</td></tr>
+    <tr><td>Fußzeile Mitte</td><td><code>WET</code>: Pegel des Hallanteils am Ausgang, −48 dB bis 10 V, auf einer schattierten Spur; über 9 V heller</td></tr>
+    <tr><td>Fußzeile rechts</td><td><code>FINE …</code>: was Encoder R gerade stellt, mit Wert</td></tr>
+  </table></div>
+  <p>Die Hallzeit ist eine Schätzung aus Größe und Decay des Tanks. Der Reverb filter kürzt den Hall zusätzlich, besonders in den Höhen; mit gedrehtem Filter klingt der Hall also kürzer, als die Zahl sagt.</p>
+  <h3 id="display-seiten">Die anderen Seiten</h3>
+  {{SCR:INPUT:|INPUT: Pegel in dB, Pre-delay in ms, rechts der Zustand von Diffuse input (Encoder L drücken).}}
+  {{SCR:TONE: Filter|TONE: Input filter als Low cut bei 126 Hz, Reverb filter als High cut bei 766 Hz; Dry/Wet ist nach dem Seitenwechsel noch nicht abgeholt (Strich rechts im Balken).}}
+  {{SCR:SPACE im Tuned|SPACE im Tuned Mode mit Freeze: Unter Size steht die Tonhöhe des Tanks, unter Decay RT inf.}}
+  <h3 id="mod-shape-bild">Mod shape als Bild</h3>
+  <p>Auf der Seite MOD zeigt die Spalte Shape keine Zahl, sondern die LFO-Form: zwei Perioden, und ein Punkt läuft mit dem ersten der vier LFOs mit. Darunter die drei Grundformen klein: fallende Rampe, Dreieck, steigende Rampe. Die nächstliegende leuchtet am hellsten. Der waagerechte Strich darunter wandert mit dem Poti von links nach rechts, eine senkrechte Marke zeigt Regler + CV.</p>
+  <div class="scr-grid">
+  {{SCR:MOD: Shape 0 %|Shape 0 %: fallende Rampe}}
+  {{SCR:MOD: Depth|Shape 50 %: Dreieck (ab Werk)}}
+  {{SCR:MOD: Shape 75 %|Shape 75 %: schiefes Dreieck}}
+  {{SCR:MOD: Shape 30 %|Shape 30 % mit +2 V CV: zu hören sind 70 %}}
+  </div>
+
+<!--KAPITEL id="ein-und-ausgaenge" gruppe="Spielen" titel="Ein- und Ausgänge"-->
+  <p>Alle Ein- und Ausgänge sind NT-Busse und auf den Seiten <i>Routing</i> und <i>CV inputs</i> frei wählbar. Ab Werk hört Sary-Shagan nur auf Audio; die CV-Eingänge stehen auf None.</p>
+  <div class="tbl"><table>
+    <tr><th>Signal</th><th>Standard</th><th>NT-Bus</th><th>Inhalt</th></tr>
+    <tr><td>Input L</td><td>Eingang 1 (In 1)</td><td>1</td><td>Audio links</td></tr>
+    <tr><td>Input R</td><td>Eingang 2 (In 2)</td><td>2</td><td>Audio rechts; None = Input L auf beiden Seiten</td></tr>
+    <tr><td>Output L</td><td>Ausgang 1 (Out 1)</td><td>13</td><td>trocken + Hall, Add/Replace</td></tr>
+    <tr><td>Output R</td><td>Ausgang 2 (Out 2)</td><td>14</td><td>trocken + Hall, Add/Replace</td></tr>
+    <tr><td>10 CV-Eingänge</td><td>None</td><td>frei</td><td>±5 V = ganzer Regelweg, siehe {{KAP:cv-steuerung}}</td></tr>
+    <tr><td>Freeze gate</td><td>None</td><td>frei</td><td>über 2 V: Freeze (Momentary: solange es anliegt; Latch: jede Flanke schaltet um)</td></tr>
+    <tr><td>Clear gate</td><td>None</td><td>frei</td><td>steigende Flanke über 2 V: Clear</td></tr>
+  </table></div>
+  <p>Der Hall rechnet mono: Wie bei Plateau wird der Eingang summiert, die Stereobreite entsteht im Tank. Gates schalten über 2 V und erst unter 1 V wieder ab. Ausgänge auf <i>Add</i> mischen Sary-Shagan auf den Bus; unter 100 % Dry/Wet liegt dann das trockene Signal doppelt, wenn derselbe Bus auch Eingang ist. Für einen reinen Insert-Hall daher <i>Replace</i> wählen.</p>
+
+<!--KAPITEL id="raum" gruppe="Hall formen" titel="Raum"-->
+  <p>Die Seite SPACE formt den Tank selbst: wie dicht, wie groß, wie lang. Sie ist die Startseite.</p>
+  <h3 id="diffusion">Diffusion</h3>
+  <p><i>Diffusion</i> stellt die Allpässe im Tank. Ganz rechts (ab Werk) verschmieren sie jeden Einsatz zu einer glatten Fläche. Nach links werden einzelne Echos und ein leichtes Flattern hörbar; ganz links bleibt ein metallisches Echo-Netz. Für Perkussion klingt weniger Diffusion oft lebendiger.</p>
+  <h3 id="size">Size</h3>
+  <p><i>Size</i> skaliert alle Verzögerungen im Tank, quadratisch über den Weg: von einer winzigen Kammer (1 % der Grundgröße) bis zum Vierfachen. Eine Änderung von Size während der Hall klingt, verschiebt die Tonhöhe der Fahne kurz, wie ein Bandecho. Das ist gewollt und ein Teil des Plateau-Klangs; Size ist geglättet, damit es nicht knackt.</p>
+  <h3 id="decay">Decay</h3>
+  <p><i>Decay</i> ist die Rückkopplung im Tank mit Plateaus Kurve: Die obere Hälfte des Wegs ist fein aufgelöst, ganz rechts klingt der Hall fast endlos. Wie lang das ist, hängt von Size ab; das Display rechnet beides zur geschätzten Hallzeit zusammen.</p>
+  <div class="tbl"><table>
+    <tr><th>Size</th><th>Decay</th><th>Display</th><th>Eindruck</th></tr>
+    <tr><td>25 %</td><td>45 %</td><td>RT 1.2 s</td><td>kleine Platte, Snare und Stimme</td></tr>
+    <tr><td>50 %</td><td>50 %</td><td>RT 5.6 s</td><td>ab Werk: großer Raum</td></tr>
+    <tr><td>60 %</td><td>70 %</td><td>RT 24 s</td><td>Halle, Flächen</td></tr>
+    <tr><td>85 %</td><td>90 %</td><td>RT 445 s</td><td>praktisch endlos</td></tr>
+  </table></div>
+  <h3 id="freeze">Freeze</h3>
+  <p><i>Freeze</i> setzt die Rückkopplung auf 1 und blendet die Filter im Tank über etwa eine Sekunde aus, damit der Klang stehen bleibt und nicht dumpf wird. Der Eingang läuft weiter in den Tank, wie bei Plateau: Was du in eine gefrorene Fläche spielst, schichtet sich dazu. Wer das nicht will, dreht vorher <i>Input level</i> herunter. Freeze kommt von drei Stellen, die zusammenwirken: dem Parameter <i>Freeze</i>, Taste 3 und dem <i>Freeze gate</i>. Mit <i>Freeze mode</i> = Momentary hält Taste 3 bzw. das Gate nur, solange es anliegt; mit Latch schaltet jeder Druck bzw. jede Flanke um.</p>
+  <h3 id="clear">Clear</h3>
+  <p><i>Clear</i> löscht den Hall: Ausgang und Eingang des Tanks blenden in 4 ms aus, der Speicher wird geleert, dann blenden beide in 4 ms wieder ein. Das Leeren dauert bei 48 kHz einige Audioblöcke; so lange zeigt das Display <code>CLR</code>. Auslösen per Taste 4, steigender Flanke am <i>Clear gate</i> oder Parameter <i>Clear</i>.</p>
+
+<!--KAPITEL id="eingang-und-klangfarbe" gruppe="Hall formen" titel="Eingang und Klangfarbe"-->
+  <p>Die Seiten INPUT und TONE bestimmen, was in den Hall hineingeht und wie er klingt.</p>
+  <h3 id="input-level">Input level</h3>
+  <p><i>Input level</i> regelt nur, was in den Tank geht, von −inf bis +2,5 dB (Mesa: bis 1,3-fach). Das trockene Signal bleibt unberührt. Ganz links kommt nichts mehr in den Hall; zusammen mit Freeze lässt sich so eine Fläche halten, ohne dass Neues dazukommt. Liegt am Eingang mehr als 9,6 V, zeigt die Kopfzeile <code>CLIP</code>.</p>
+  <h3 id="pre-delay">Pre-delay</h3>
+  <p><i>Pre-delay</i> verzögert den Hall gegenüber dem trockenen Signal um 0–500 ms. 10–30 ms lassen den Einsatz eines Instruments frei stehen; längere Zeiten trennen Klang und Raum deutlich, bis hin zu einem Echo vor dem Hall.</p>
+  <h3 id="diffuse-input">Diffuse input</h3>
+  <p><i>Diffuse input</i> schaltet die vier Allpässe vor dem Tank. An (ab Werk) beginnt der Hall weich und sofort dicht. Aus hört man den Einsatz als kurzes Echo-Muster, bevor der Tank ihn verschmiert; das klingt bei Perkussion knackiger. Am NT schaltet <b>Encoder L drücken</b> um.</p>
+  <h3 id="filter">Input filter und Reverb filter</h3>
+  <p>Beide Filter sind ein Regler, wie an Mesa: In der Mitte filtern sie nicht. Nach rechts steigt ein Low cut von 13,75 Hz bis 3,5 kHz und macht den Klang dünner. Nach links sinkt ein High cut von 14 kHz bis 110 Hz und macht ihn dunkler. Das Display zeigt den Filter mit seiner Frequenz, etwa <code>LC 220Hz</code> oder <code>HC 3.28kHz</code>.</p>
+  <ul class="lst">
+    <li><i>Input filter</i> filtert, was in den Hall geht, einmal. Gut, um Bass aus dem Hall zu halten (rechts) oder einen weit entfernten Raum anzudeuten (links).</li>
+    <li><i>Reverb filter</i> sitzt im Tank und wirkt bei jedem Umlauf erneut. Schon wenig nach links lässt die Höhen schneller ausklingen als die Tiefen, wie in einem echten Raum. Bei Freeze wird er ausgeblendet.</li>
+  </ul>
+  <h3 id="dry-wet">Dry/Wet</h3>
+  <p><i>Dry/Wet</i> blendet über: ganz links nur trocken, ganz rechts nur Hall, in der Mitte (ab Werk) beide gleich laut. Die Überblendung hält die Lautheit konstant (Equal Power). Der Hall hat Plateaus Verstärkung, er ist also ganz rechts etwa so laut wie das trockene Signal ganz links. Bei 0 % geht das trockene Signal unverändert durch.</p>
+  <h3 id="saturation">Saturation</h3>
+  <p>Mit <i>Saturation</i> = On (ab Werk) begrenzt der Ausgang weich: bis 7,5 V unverändert, darüber sanft bis 10 V, wie Mesa ab 75 %. Mit Off wird hart bei ±10 V abgeschnitten.</p>
+
+<!--KAPITEL id="modulation" gruppe="Hall formen" titel="Modulation"-->
+  <p>Vier LFOs bewegen die Verzögerungszeiten der Allpässe im Tank leicht hin und her. Das löst stehende Resonanzen auf und lässt die Fahne schweben; mehr davon klingt wie Chorus oder ein leiernder Raum.</p>
+  <h3 id="mod-depth">Mod depth</h3>
+  <p><i>Mod depth</i> ist die Auslenkung, ab Werk 5 % (Mesas Empfehlung für einen natürlichen Raum). Bis etwa 20 % hört man vor allem Weite, darüber deutliches Schweben, ganz rechts eine Tonhöhe, die wandert.</p>
+  <h3 id="mod-rate">Mod rate</h3>
+  <p><i>Mod rate</i> ist das Tempo. Die vier LFOs laufen leicht verschieden schnell (Verhältnis 1 : 1,5 : 1,2 : 1,8), damit sich kein Muster bildet. Das Display zeigt das Tempo des ersten LFO, von 0,10 bis 10 Hz; der Weg ist quadratisch, die langsamen Tempi sind fein aufgelöst.</p>
+  <h3 id="mod-shape">Mod shape</h3>
+  <p><i>Mod shape</i> verschiebt den Umkehrpunkt einer Dreieck-Sägezahn-Welle stufenlos. Alle vier LFOs bekommen dieselbe Form.</p>
+  <div class="tbl"><table>
+    <tr><th>Regler</th><th>Form</th><th>Anzeige</th><th>Klang</th></tr>
+    <tr><td>0 %</td><td>fallende Rampe: springt hoch, fällt langsam</td><td><code>Ramp down</code> (unter 10 %)</td><td>Tonhöhe sinkt gleichmäßig und springt zurück</td></tr>
+    <tr><td>50 %</td><td>Dreieck (ab Werk)</td><td><code>Triangle</code> (45–55 %)</td><td>gleichmäßiges Hin und Her, wie Chorus</td></tr>
+    <tr><td>100 %</td><td>steigende Rampe: steigt langsam, fällt schlagartig</td><td><code>Ramp up</code> (über 90 %)</td><td>Tonhöhe steigt gleichmäßig und springt zurück</td></tr>
+  </table></div>
+  <p>Dazwischen liegen schiefe Dreiecke. Sinus, Rechteck oder Zufall gibt es nicht, weil Plateau sie nicht hat. Hörbar wird die Form erst mit mehr Mod depth.</p>
+
+<!--KAPITEL id="tuned-mode" gruppe="Hall formen" titel="Tuned Mode"-->
+  <p>Im Tuned Mode wird der Tank so kurz, dass er nicht mehr nach Raum klingt, sondern nach einer gestimmten Saite oder Röhre: Jeder Impuls am Eingang regt einen Ton an.</p>
+  <h3 id="tuned-an">Einschalten</h3>
+  <p><b>Encoder R drücken</b> (VCV: PUSH TUNED, nt_emu: Taste 2) oder Parameter <i>Tuned</i>. Die Kopfzeile zeigt <code>TUNED</code>, unter Size steht die Tonhöhe des Tanks.</p>
+  <h3 id="tuned-size">Size als Tonhöhe</h3>
+  <p><i>Size</i> läuft jetzt exponentiell über fünf Oktaven, von etwa 17 Hz (ganz rechts) bis 550 Hz (ganz links). Das Display rechnet die Tonhöhe aus einem Umlauf durch den Tank; der Klang hat je nach Diffusion weitere Teiltöne, die Anzeige ist also eine Orientierung.</p>
+  <div class="tbl"><table>
+    <tr><th>Size</th><th>Tonhöhe (Display)</th></tr>
+    <tr><td>0 %</td><td>551 Hz</td></tr>
+    <tr><td>25 %</td><td>232 Hz</td></tr>
+    <tr><td>50 %</td><td>98 Hz</td></tr>
+    <tr><td>75 %</td><td>41 Hz</td></tr>
+    <tr><td>100 %</td><td>17 Hz</td></tr>
+  </table></div>
+  <h3 id="tuned-cv">Size-CV mit 1 V/Okt.</h3>
+  <p>Im Tuned Mode ist <i>Size CV</i> ein Tonhöhen-CV wie an Mesa: +1 V hebt den Tank um eine Oktave, −1 V senkt ihn. Ein Sequencer auf diesem Eingang spielt den Resonator also melodisch. Wenig <i>Diffusion</i> macht den Ton klarer, viel <i>Decay</i> lässt ihn länger klingen.</p>
+
+<!--KAPITEL id="cv-steuerung" gruppe="Hall formen" titel="Modulation und Steuerung per CV"-->
+  <p>Sary-Shagan hat zehn CV-Eingänge in Mesas Reihenfolge, dazu die Gates für Freeze und Clear. Jeder Eingang wird auf der Seite <i>CV inputs</i> einem NT-Eingang oder Bus zugewiesen; ab Werk stehen alle auf None.</p>
+  <h3 id="cv-eingaenge">Eingänge und Ziele</h3>
+  <div class="tbl"><table>
+    <tr><th>Eingang</th><th>wirkt auf</th><th>Besonderheit</th></tr>
+    <tr><td>In filter CV</td><td><i>Input filter</i></td><td>bipolar: +2,5 V aus der Mitte = ganz rechts</td></tr>
+    <tr><td>Diffusion CV</td><td><i>Diffusion</i></td><td></td></tr>
+    <tr><td>Size CV</td><td><i>Size</i></td><td>im Tuned Mode 1 V/Okt. ({{KAP:tuned-mode}})</td></tr>
+    <tr><td>Dry/Wet CV</td><td><i>Dry/Wet</i></td><td></td></tr>
+    <tr><td>Rvb filter CV</td><td><i>Reverb filter</i></td><td></td></tr>
+    <tr><td>Pre-delay CV</td><td><i>Pre-delay</i></td><td>Änderungen sind geglättet, klingen aber wie ein Bandecho</td></tr>
+    <tr><td>Mod depth CV · Mod rate CV · Mod shape CV</td><td>Modulation</td><td></td></tr>
+    <tr><td>Decay CV</td><td><i>Decay</i></td><td>bei Freeze ohne Wirkung</td></tr>
+    <tr><td>Freeze gate</td><td><i>Freeze</i></td><td>über 2 V; Momentary oder Latch</td></tr>
+    <tr><td>Clear gate</td><td><i>Clear</i></td><td>steigende Flanke über 2 V</td></tr>
+  </table></div>
+  <h3 id="cv-summe">Regler plus CV</h3>
+  <p>Wie an Mesa gilt ±5 V = ganzer Regelweg, zur Reglerstellung addiert und an den Enden begrenzt: Regler auf 0 % und +5 V ist wie Regler auf 100 %. Der Wert des Parameters selbst bleibt dabei stehen; das Display zeigt mit einer Marke unter dem Balken, wo Regler + CV stehen. CVs werden einmal je Audioblock gelesen (gemittelt); Size, Decay, Dry/Wet, Pre-delay, Mod depth und Input level sind zusätzlich geglättet.</p>
+  <h3 id="nt-mapping">NT-Mapping und Busse</h3>
+  <p>Der NT hat zwölf Eingänge; mit zwei Audio-Eingängen bleiben zehn für CV und Gates. Was nicht auf eine Buchse passt, kann von einem anderen Algorithmus über einen Aux-Bus kommen (ein LFO-Algorithmus vor Sary-Shagan, Ausgang auf Aux). Zusätzlich lässt sich jeder Parameter über das normale CV-, MIDI- oder I2C-Mapping des NT steuern; das ändert dann den Parameter selbst, und die Potis holen danach ab. In nt_emu gilt dasselbe, soweit der Emulator die Busse und Mappings anbietet.</p>
+
+<!--KAPITEL id="rezepte" gruppe="Praxis" titel="Rezepte"-->
+  <p>Jedes Rezept nennt die Einstellungen als Seite → Parameter = Wert und die Kabel als Quelle → Eingang. Was nicht genannt ist, bleibt ab Werk. Die Werte sind aus den Formeln des Plug-ins gerechnet, nicht am Gerät abgehört; nimm sie als Startpunkt.</p>
+  <h3 id="kathedrale">Kathedrale aus einem Ton</h3>
+  <p>Ein einzelner Ton wird zu einer weiten, dunklen Halle, die lange nachschwingt.</p>
+  <div class="patch"><span class="n">Space</span><span class="r"><b>Size</b> = 60 % · <b>Decay</b> = 70 % (Display RT 24 s)</span><span class="n">Tone</span><span class="r"><b>Dry/Wet</b> = 60 % · <b>Reverb filter</b> = HC 2.02kHz · <b>Input filter</b> = LC 73Hz</span><span class="n">Input</span><span class="r"><b>Pre-delay</b> = 40 ms</span><span class="n">Modulation</span><span class="r"><b>Mod depth</b> = 12 %</span><span class="n">Kabel</span><span class="r">Stimme mit kurzen Tönen → In 1</span></div>
+  <p>Mit <i>Reverb filter</i> weiter links wird daraus eine Höhle, mit Low cut im Tank eine Halle aus Glas.</p>
+  <h3 id="plate-auf-der-snare">Platte auf der Snare</h3>
+  <p>Ein kurzer, heller Plattenhall, der den Schlag größer macht, ohne ihn zu verwaschen.</p>
+  <div class="patch"><span class="n">Space</span><span class="r"><b>Size</b> = 25 % · <b>Decay</b> = 45 % (RT 1.2 s) · <b>Diffusion</b> = 80 %</span><span class="n">Input</span><span class="r"><b>Pre-delay</b> = 20 ms</span><span class="n">Tone</span><span class="r"><b>Input filter</b> = LC 126Hz · <b>Dry/Wet</b> = 30 %</span><span class="n">Kabel</span><span class="r">Snare oder Clap → In 1</span></div>
+  <p>Mit <i>Diffuse input</i> = Off wird der Einsatz knackiger, fast wie ein Slapback vor dem Hall.</p>
+  <h3 id="gefrorene-flaeche">Gefrorene Fläche</h3>
+  <p>Ein Akkord bleibt stehen, darüber spielst du weiter.</p>
+  <div class="patch"><span class="n">Space</span><span class="r"><b>Size</b> = 60 % · <b>Decay</b> = 70 %</span><span class="n">Tone</span><span class="r"><b>Dry/Wet</b> = 50 %</span><span class="n">Modes</span><span class="r"><b>Freeze mode</b> = Latch</span><span class="n">Spielen</span><span class="r">Akkord spielen, Taste 3; Melodie darüber; Taste 3 löst</span></div>
+  <p>Mit <i>Input level</i> = −inf nach dem Einfrieren bleibt die Fläche unverändert; mit einem Gate vom Sequencer auf <i>Freeze gate</i> friert sie im Takt.</p>
+  <h3 id="gestimmter-resonator">Gestimmter Resonator</h3>
+  <p>Klicks und Rauschstöße werden zu gezupften, metallischen Tönen, die einer Melodie folgen.</p>
+  <div class="patch"><span class="n">Modes</span><span class="r"><b>Tuned</b> = On</span><span class="n">Space</span><span class="r"><b>Size</b> = 50 % (98 Hz) · <b>Decay</b> = 85 % · <b>Diffusion</b> = 20 %</span><span class="n">Tone</span><span class="r"><b>Dry/Wet</b> = 100 %</span><span class="n">CV inputs</span><span class="r"><b>Size CV</b> = Input 3</span><span class="n">Kabel</span><span class="r">Sequencer V/Okt. → In 3 · Trigger oder Rauschstoß → In 1</span></div>
+  <p>Mit mehr <i>Diffusion</i> wird aus der Saite eine Glocke, mit <i>Mod depth</i> um 30 % ein leicht verstimmter Chor.</p>
+  <h3 id="schwebender-hall">Schwebender Hall</h3>
+  <p>Ein langer Hall, der wie ein Chorus schwebt und die Tonhöhe sanft wandern lässt.</p>
+  <div class="patch"><span class="n">Space</span><span class="r"><b>Size</b> = 50 % · <b>Decay</b> = 60 %</span><span class="n">Modulation</span><span class="r"><b>Mod depth</b> = 50 % · <b>Mod rate</b> = 30 % (0.99 Hz) · <b>Mod shape</b> = Triangle</span><span class="n">Tone</span><span class="r"><b>Dry/Wet</b> = 50 %</span><span class="n">Kabel</span><span class="r">Pad oder Gitarre → In 1</span></div>
+  <p>Mit <i>Mod shape</i> = Ramp down sinkt der Hall gleichmäßig ab, wie ein Band, das langsamer wird.</p>
+  <h3 id="gummiraum">Gummiraum</h3>
+  <p>Der Raum dehnt sich langsam und zieht dabei die Tonhöhe der Fahne mit, wie bei einem leiernden Band.</p>
+  <div class="patch"><span class="n">Space</span><span class="r"><b>Size</b> = 40 % · <b>Decay</b> = 60 % (RT 5.8 s)</span><span class="n">CV inputs</span><span class="r"><b>Size CV</b> = Input 3</span><span class="n">Kabel</span><span class="r">langsamer LFO (0,1–0,3 Hz, ±1 V) → In 3 · Stimme → In 1</span></div>
+  <p>Mit einer Zufallsspannung statt des LFOs springt der Raum in neue Größen und rutscht jedes Mal hörbar hinterher.</p>
+  <h3 id="hall-im-takt">Hall im Takt</h3>
+  <p>Ein großer Hall, der auf jeden Takt abgeschnitten wird: rhythmisches Pumpen wie ein Gated Reverb.</p>
+  <div class="patch"><span class="n">Space</span><span class="r"><b>Size</b> = 40 % · <b>Decay</b> = 80 %</span><span class="n">Tone</span><span class="r"><b>Dry/Wet</b> = 60 %</span><span class="n">CV inputs</span><span class="r"><b>Clear gate</b> = Input 4</span><span class="n">Kabel</span><span class="r">Clock (Viertel oder Halbe) → In 4 · Drums → In 1</span></div>
+  <p>Mit derselben Clock auf <i>Freeze gate</i> (Latch) statt auf Clear wechseln gehaltene und freie Takte ab.</p>
+
+<!--KAPITEL id="hintergrund" gruppe="Praxis" titel="Hintergrund: der Dattorro-Hall"-->
+  <p>Jon Dattorro hat 1997 im Journal der Audio Engineering Society einen Plattenhall beschrieben, der auf einem Hall-Design von Lexicon aufbaut. Plateau setzt ihn um, Sary-Shagan übernimmt Plateaus Umsetzung.</p>
+  <ul class="lst">
+    <li><b>Eingang:</b> Das Signal wird mono summiert, gefiltert und verzögert (Pre-delay). Vier hintereinandergeschaltete Allpässe zerstreuen es, ohne seine Klangfarbe zu ändern (<i>Diffuse input</i>).</li>
+    <li><b>Tank:</b> Zwei gleich gebaute Schleifen, jede aus einem modulierten Allpass, einer Verzögerung, einem Dämpfungsfilter, einem zweiten Allpass und einer zweiten Verzögerung. Das Ende der linken Schleife speist die rechte und umgekehrt; dazwischen sitzt die Rückkopplung (<i>Decay</i>). Die Verzögerungen sind teilerfremd, damit sich keine Resonanzen stapeln. <i>Size</i> skaliert sie alle.</li>
+    <li><b>Ausgang:</b> Jede Seite liest an sieben Stellen aus beiden Schleifen und summiert mit wechselndem Vorzeichen. Daher kommt die Stereobreite aus einem Mono-Eingang.</li>
+  </ul>
+  <p>Die Delay-Leitungen sind der Hall; sie lassen sich nicht auslagern. Nur das Pre-delay ist ein gewöhnliches Delay vor dem Hall. Bei sehr kurzen Verzögerungen (Tuned Mode) wird der Tank zu einem Kammfilter mit Rückkopplung, also zu einem gestimmten Resonator.</p>
+
+<!--KAPITEL id="parameter-referenz" gruppe="Nachschlagen" titel="Parameter-Referenz"-->
+  <p>Je NT-Seite eine Tabelle. Die vollständige, aus dem Plug-in erzeugte Liste mit allen Bereichen steht im {{KAP:anhang}}.</p>
+  <h3 id="seite-input">Input</h3>
+  <div class="tbl"><table>
+    <tr><th>Parameter</th><th>Bereich</th><th>Standard</th><th>Wirkung</th></tr>
+    <tr><td><i>Input level</i></td><td>−inf … +2,5 dB</td><td>0 dB</td><td>Pegel in den Hall; trocken unberührt</td></tr>
+    <tr><td><i>Pre-delay</i></td><td>0–500 ms</td><td>0 ms</td><td>Verzögerung vor dem Hall</td></tr>
+    <tr><td><i>Diffuse input</i></td><td>Off · On</td><td>On</td><td>vier Allpässe vor dem Tank</td></tr>
+  </table></div>
+  <h3 id="seite-space">Space</h3>
+  <div class="tbl"><table>
+    <tr><th>Parameter</th><th>Bereich</th><th>Standard</th><th>Wirkung</th></tr>
+    <tr><td><i>Diffusion</i></td><td>0–100 %</td><td>100 %</td><td>Dichte im Tank</td></tr>
+    <tr><td><i>Size</i></td><td>0–100 %</td><td>50 %</td><td>Zeitskala 0,01–4, quadratisch; Tuned: 551–17 Hz</td></tr>
+    <tr><td><i>Decay</i></td><td>0–100 %</td><td>50 %</td><td>Rückkopplung 0,1–0,9999 (Plateau-Kurve)</td></tr>
+  </table></div>
+  <h3 id="seite-tone">Tone</h3>
+  <div class="tbl"><table>
+    <tr><th>Parameter</th><th>Bereich</th><th>Standard</th><th>Wirkung</th></tr>
+    <tr><td><i>Input filter</i></td><td>HC 110 Hz … Off … LC 3,52 kHz</td><td>Off</td><td>bipolar, vor dem Tank</td></tr>
+    <tr><td><i>Dry/Wet</i></td><td>0–100 %</td><td>50 %</td><td>Equal-Power-Überblendung</td></tr>
+    <tr><td><i>Reverb filter</i></td><td>HC 110 Hz … Off … LC 3,52 kHz</td><td>Off</td><td>bipolar, im Tank, bei Freeze ausgeblendet</td></tr>
+  </table></div>
+  <h3 id="seite-modulation">Modulation</h3>
+  <div class="tbl"><table>
+    <tr><th>Parameter</th><th>Bereich</th><th>Standard</th><th>Wirkung</th></tr>
+    <tr><td><i>Mod depth</i></td><td>0–100 %</td><td>5 %</td><td>Auslenkung (Plateau 0–16)</td></tr>
+    <tr><td><i>Mod rate</i></td><td>0,10–10 Hz</td><td>0,10 Hz</td><td>Tempo des ersten LFO, die anderen im Verhältnis</td></tr>
+    <tr><td><i>Mod shape</i></td><td>Ramp down … Triangle … Ramp up</td><td>Triangle</td><td>Umkehrpunkt der LFO-Welle</td></tr>
+  </table></div>
+  <h3 id="seite-modes">Modes</h3>
+  <div class="tbl"><table>
+    <tr><th>Parameter</th><th>Bereich</th><th>Standard</th><th>Wirkung</th></tr>
+    <tr><td><i>Freeze</i></td><td>Off · On</td><td>Off</td><td>hält den Hall</td></tr>
+    <tr><td><i>Freeze mode</i></td><td>Momentary · Latch</td><td>Momentary</td><td>Taste 3 und Gate halten oder schalten um</td></tr>
+    <tr><td><i>Clear</i></td><td>Off · On</td><td>Off</td><td>steigende Flanke löscht</td></tr>
+    <tr><td><i>Tuned</i></td><td>Off · On</td><td>Off</td><td>Resonator-Modus</td></tr>
+    <tr><td><i>Saturation</i></td><td>Off · On</td><td>On</td><td>weich ab 7,5 V statt hart bei 10 V</td></tr>
+  </table></div>
+  <h3 id="seite-cv">CV inputs</h3>
+  <p>Zehn CV-Eingänge (<i>In filter CV</i> … <i>Decay CV</i>), <i>Freeze gate</i>, <i>Clear gate</i>; jeweils None oder ein Bus, ab Werk None. Wirkung in {{KAP:cv-steuerung}}.</p>
+  <h3 id="seite-routing">Routing</h3>
+  <div class="tbl"><table>
+    <tr><th>Parameter</th><th>Bereich</th><th>Standard</th><th>Wirkung</th></tr>
+    <tr><td><i>Input L</i></td><td>Bus</td><td>Input 1</td><td>Audio links</td></tr>
+    <tr><td><i>Input R</i></td><td>None oder Bus</td><td>Input 2</td><td>None = Input L</td></tr>
+    <tr><td><i>Output L</i> · <i>Output R</i></td><td>Bus</td><td>Output 1 · Output 2</td><td>Ausgänge</td></tr>
+    <tr><td><i>Output L mode</i> · <i>Output R mode</i></td><td>Add · Replace</td><td>Add</td><td>auf den Bus mischen oder ersetzen</td></tr>
+  </table></div>
+
+<!--KAPITEL id="vcv" gruppe="Nachschlagen" titel="Das VCV-Modul"-->
+  <p>In VCV Rack ist Sary-Shagan ein Modul der Marke 3F4. Im Modul läuft das NT-Plug-in selbst, unverändert, in einem kleinen NT-Host aus Perseids. Es trägt den Hausstil von Perseids: dunkles Panel, hellblaue Beschriftung, farbige Ringe an IN und OUT.</p>
+  <h4 id="vcv-panel">Panel</h4>
+  {{PANEL|Sary-Shagan, 24 HP, gerendert mit Racks eigenem SVG-Renderer.}}
+  <p>Von oben nach unten: Display; drei Potis, groß beschriftet für SPACE, klein für INPUT · TONE · MOD; links PAGE mit ◀ ▶ und PUSH DIFFUSE, in der Mitte FREEZE, CLEAR und MENU, rechts FINE mit ◀ ▶ und PUSH TUNED; unten die Buchsen. Die Belegung steht in {{KAP:bedienung}}.</p>
+  <h4 id="vcv-buchsen">Buchsen</h4>
+  <div class="tbl"><table>
+    <tr><th>Reihe</th><th>Buchsen</th></tr>
+    <tr><td>oben</td><td>PRE-DLY · IN FILT · DIFFUSION · SIZE · DRY/WET · RVB FILT · FREEZE · CLEAR</td></tr>
+    <tr><td>unten</td><td>IN L · IN R · DEPTH · RATE · SHAPE · DECAY · OUT L · OUT R</td></tr>
+  </table></div>
+  <p>IN und OUT liegen waagerecht unten wie bei allen 3F4-Modulen; die CV-Buchsen behalten Mesas Spalten (Mod depth unter Diffusion … Decay unter Rvb filter). Anders als am NT sind die Buchsen ab Werk verdrahtet: die zehn CVs auf den NT-Eingängen 3–12, FREEZE und CLEAR auf den Aux-Bussen 21 und 22, weil der NT nur zwölf Eingänge hat. Im Menü heißen die Busse wie die Buchsen (<code>Size jack</code>, <code>Freeze jack</code> …). IN R leer heißt IN L auf beiden Seiten.</p>
+  <h4 id="vcv-lichter">Lichter</h4>
+  <p>FREEZE leuchtet, solange der Hall gefroren ist, egal ob durch Taster, Parameter oder Buchse. CLEAR blitzt bei jedem Auslösen.</p>
+  <h4 id="vcv-midi">MIDI-Controller</h4>
+  <p>Jedes Bedienelement ist ein eigener Rack-Parameter; MIDI-Map lernt sie wie gewohnt. Potis auf absolute Regler (sie holen ab), PAGE und FINE auf Endlos-Encoder: ein absoluter CC über den ganzen Weg ergibt 24 Rasten. Die ◀ ▶-Taster, PUSH, FREEZE, CLEAR und MENU auf Pads.</p>
+  <h4 id="vcv-menue">Rechtsklick-Menü</h4>
+  <p>Schalter für <i>Tuned</i> (Size-CV = Tonhöhe), <i>Diffuse input</i>, Freeze latcht (Taster und Buchse) und weiche Ausgangsbegrenzung. Alles andere über MENU. <b>Initialize</b> setzt alle Parameter auf ab Werk; die Buchsen bleiben dabei verdrahtet.</p>
+  {{VSCR:MENU|Das Parametermenü im Modul-Display, geöffnet mit MENU.}}
+  <h4 id="vcv-speichern">Speichern</h4>
+  <p>Alle Parameter werden mit dem Patch gespeichert, nach Namen wie in einem NT-Preset. Der Inhalt des Halls wird nicht gespeichert. Bei einem Wechsel der Sample-Rate baut das Modul den Hall neu auf und behält die Einstellungen.</p>
+
+<!--KAPITEL id="grenzen" gruppe="Nachschlagen" titel="Grenzen und Stand der Prüfung"-->
+  <p>Sary-Shagan v{{VER}} ist gebaut und in der Simulation geprüft, als NT-Plug-in, als nt_emu-DLL und als VCV-Modul. In VCV Rack und auf echter NT-Hardware lief es noch nicht. Das ist der wichtigste offene Punkt.</p>
+  <h3 id="anders-als-das-vorbild">Anders als das Vorbild</h3>
+  <ul class="lst">
+    <li><b>Sample-Rate im Tank:</b> Plateau rechnet den Tank intern immer mit 44,1 kHz; bei 48 kHz klingt es dadurch einen rund 9 % kleineren, helleren Raum. Sary-Shagan skaliert richtig und klingt bei jeder Rate wie Plateau bei 44,1 kHz. Auch die LFOs folgen der echten Rate.</li>
+    <li><b>Von Mesa übernommen:</b> Bedienung in Dreiergruppen, bipolare Filter, Dry/Wet, Input level, zehn CV-Eingänge mit ±5 V, Freeze halten/umschalten, Size-CV im Tuned Mode, weiche Ausgangsbegrenzung.</li>
+    <li><b>Nicht übernommen:</b> Mesas <i>Reverse</i> (rückwärts in den Tank) ist neue DSP, die Plateau nicht hat. Keine Clip-LEDs, stattdessen <code>CLIP</code> im Display.</li>
+    <li><b>Rechnung:</b> float statt double, Mesa rechnet mit 96 kHz, Sary-Shagan mit der NT-Rate.</li>
+  </ul>
+  <h3 id="grenzen-im-einzelnen">Grenzen</h3>
+  <ul class="lst">
+    <li>Pre-delay höchstens 500 ms (Plateau per CV bis 1 s).</li>
+    <li>CVs und Gates werden blockweise gelesen; schnelle Audio-Modulation der Parameter geht nicht.</li>
+    <li>Der Hall rechnet mono am Eingang, wie Plateau.</li>
+    <li>Keine Werks-Presets.</li>
+  </ul>
+  <h3 id="bekannte-eigenheiten">Bekannte Eigenheiten</h3>
+  <ul class="lst">
+    <li>Size zu ändern verschiebt die Tonhöhe der Fahne kurz (geglättet, aber hörbar). Das gehört zum Plateau-Klang.</li>
+    <li>Die Hallzeit im Display berücksichtigt den Reverb filter nicht.</li>
+    <li>In nt_emu kommen Tasten erst beim Loslassen an: Taste 3 schaltet Freeze dort immer um, statt zu halten.</li>
+    <li>Mit Modulation weicht Sary-Shagan rund 36 dB unter dem Signal vom Original ab, weil die LFO-Phase in float über die Zeit minimal wegdriftet; ohne Modulation sind es 83–101 dB.</li>
+  </ul>
+  <h3 id="pruefstand">Prüfstand</h3>
+  <div class="tbl"><table>
+    <tr><th>Prüfung</th><th>Ergebnis</th><th>Version</th></tr>
+    <tr><td>Simulation (<code>test/host.cpp</code>, 65 Prüfungen: Impulsantwort, Dry/Wet, Input level −inf, Stabilität 60 s bei maximalem Decay, Freeze per Gate momentan und Latch, Clear, Tuned mit Size-CV 1 V/Okt., CV-Summe und Begrenzung, bipolare Filter, 200 Parameteränderungen im Lauf, Bedienung, alle Bildschirme in den Display-Grenzen)</td><td>bestanden</td><td>v{{VER}}</td></tr>
+    <tr><td>Vergleich mit dem Original (<code>make compare</code> gegen ValleyRackFree, vier Einstellungen)</td><td>83–101 dB Abstand ohne, 36 dB mit Modulation</td><td>v{{VER}}</td></tr>
+    <tr><td>ARM-Build <code>sary_shagan.o</code> (Cortex-M7, -O2)</td><td>ohne Warnungen, rund 29 KB; offen nur NT-API und <code>expf</code></td><td>v{{VER}}</td></tr>
+    <tr><td>NT-Host mit dem echten Plug-in (<code>vcv/test/host_test.cpp</code>, 25 Prüfungen: Klang, Abholen, Encoder, Tasten, Buchsen, Menü, Speichern, zwei Instanzen)</td><td>bestanden</td><td>v{{VER}}, VCV {{VCV}}</td></tr>
+    <tr><td>VCV-Modul 3F4-SaryShagan, Windows x64 (MinGW, Rack 2.6.4-Header)</td><td>gebaut, braucht nur <code>libRack.dll</code> und Windows; in Rack noch nicht ausprobiert</td><td>VCV {{VCV}}</td></tr>
+    <tr><td>nt_emu (<code>sary_shagan.dll</code>)</td><td>gebaut; Ladetest unter Wine am 24.10.2026 bestanden, in nt_emu noch nicht ausprobiert</td><td>v{{VER}}</td></tr>
+    <tr><td>disting NT Hardware</td><td>nicht getestet</td><td>–</td></tr>
+  </table></div>
+  <h3 id="rack-checkliste">Checkliste im Rack</h3>
+  <ul class="lst">
+    <li>☐ Sary-Shagan erscheint unter 3F4, Panel wie in {{KAP:vcv}}</li>
+    <li>☐ Hall ab Werk; Display wie in {{KAP:display}}; Potis holen ab</li>
+    <li>☐ PAGE, FINE, PUSH DIFFUSE, PUSH TUNED, FREEZE, CLEAR, MENU tun, was {{KAP:bedienung}} sagt</li>
+    <li>☐ Jede CV-Buchse bewegt ihre Marke im Display; SIZE im Tuned Mode spielt 1 V/Okt.</li>
+    <li>☐ FREEZE- und CLEAR-Buchse mit Gate und Clock</li>
+    <li>☐ Patch speichern und laden, Initialize, Sample-Rate wechseln</li>
+    <li>☐ CPU-Anzeige von Rack bei viel Mod depth</li>
+  </ul>
+  <h3 id="hardware-checkliste">Hardware-Checkliste</h3>
+  <ul class="lst">
+    <li>☐ Plug-in lädt, Algorithmus erscheint als Sary-Shagan</li>
+    <li>☐ CPU-Last eines Slots bei 48 und 96 kHz, mit und ohne Modulation</li>
+    <li>☐ Speicherbedarf: rund 790 KB DRAM bei 48 kHz, 1,6 MB bei 96 kHz, 6 KB DTC</li>
+    <li>☐ Bedienung über Potis (Abholen), Encoder, Taste 3 halten und Taste 4</li>
+    <li>☐ Clear ohne Knacken und ohne Aussetzer</li>
+    <li>☐ Preset speichern und laden</li>
+    <li>☐ NT Helper: Parameterseiten, Werte, MIDI-Mapping</li>
+  </ul>
+
+<!--KAPITEL id="anhang" gruppe="Nachschlagen" titel="Anhang: Wo steht was"-->
+  <p>Erzeugt aus der Parameterliste des Plug-ins (<code>test/host --list</code>), passt also immer zur Version. Seiten in Menü-Reihenfolge, Werte so, wie das NT-Menü sie zeigt.</p>
+{{ANHANG}}
+
+<!--KAPITEL id="versionen" gruppe="Nachschlagen" titel="Versionshistorie"-->
+  <p>Neueste Version oben. Das VCV-Modul hat eigene Nummern; es enthält das NT-Plug-in selbst.</p>
+  <div class="tbl"><table>
+    <tr><th>Version</th><th>Datum</th><th>Was dazukam</th></tr>
+    <tr><td>v0.4, VCV 2.1.0</td><td>21.11.2026</td><td>Eigenes Repo <code>xof-112/sary-shagan</code> mit Submodulen, Build für alle drei Fassungen, Parameterliste für den Anhang, dieses Handbuch.</td></tr>
+    <tr><td>v0.4, VCV 2.1.0</td><td>24.10.2026</td><td>Umbenannt von Grando in Sary-Shagan (neue Kennung, VCV-Slug <code>3F4-SaryShagan</code>). Mod shape als Wellenbild mit den drei Grundformen; Fußzeile mit WET-Pegel in der Mitte und FINE rechts; IN/OUT am VCV-Panel waagerecht unten; Auslieferung als ZIP.</td></tr>
+    <tr><td>v0.3, VCV 2.1.0</td><td>24.10.2026</td><td>Bedienung und CV-Eingänge nach Mesa: vier Seiten INPUT/SPACE/TONE/MOD, Input level, bipolare Filter, Dry/Wet, zehn CV-Eingänge ±5 V, Freeze- und Clear-Gate, Size-CV als Tonhöhe im Tuned Mode, Freeze halten oder umschalten, Encoder R als Feinabstimmung, weiche Begrenzung ab Werk an, CLIP-Anzeige. VCV-Modul 24 HP mit Buchsenfeld nach Mesa.</td></tr>
+    <tr><td>v0.2, VCV 2.0.0</td><td>24.10.2026</td><td>Natives VCV-Modul (22 HP) mit dem NT-Plug-in im NT-Host aus Perseids; Potis holen auch ohne Soft Takeover ab.</td></tr>
+    <tr><td>v0.1</td><td>24.10.2026</td><td>Als <i>Grando</i>: NT-Plug-in mit Plateaus Dattorro-Tank, Seiten ROOM/TONE/MOTION, Hold, Clear, Tuned mit Pitch CV; nt_emu-DLL; Vergleich mit dem Original.</td></tr>
+  </table></div>
+
+<!--KAPITEL id="quellen" gruppe="Nachschlagen" titel="Quellen und Credits"-->
+  <h3 id="herkunft-der-ideen">Herkunft der Ideen</h3>
+  <ul class="lst">
+    <li>Dale Johnson (Valley Audio Soft): <a href="https://github.com/ValleyAudio/ValleyRackFree" target="_blank" rel="noopener">Plateau in ValleyRackFree</a>, GPL-3.0. Der Klang-Kern von Sary-Shagan ist eine Portierung davon; Copyright-Hinweis in <code>sary_shagan_dsp.h</code>.</li>
+    <li>4ms Company und Valley Audio: Mesa, Handbuch v1.0. Vorbild für Bedienung und CV-Eingänge.</li>
+    <li>Jon Dattorro: <i>Effect Design, Part 1: Reverberator and Other Filters</i>, J. Audio Eng. Soc. 45(9), 1997.</li>
+  </ul>
+  <h3 id="zum-weiterlesen">Zum Weiterlesen</h3>
+  <ul class="lst">
+    <li>Valley Audio: Handbuch zu Plateau, im Repo ValleyRackFree.</li>
+    <li>Weitere Plateau-Ableger mit offenem Bezug: Campestria (Noise Engineering Versio), Dart Spark Plateau 2, iPlateau (iPlug2).</li>
+  </ul>
+  <h3 id="werkzeuge">Werkzeuge</h3>
+  <ul class="lst">
+    <li><a href="https://github.com/expertsleepersltd/distingNT_API" target="_blank" rel="noopener">disting NT API</a> von Expert Sleepers (MIT), VCV Rack SDK.</li>
+    <li>NT-Host und 3F4-Panel-Kit aus Perseids; Bildschirm-Raster und Schriften aus nt_emu (MIT, © Neal Sanche; Tom Thumb MIT, Selawik OFL, pixelmix von Andrew Tyler).</li>
+    <li><a href="https://nosuch.dev/nt-helper/" target="_blank" rel="noopener">nt_helper</a> von Neal Sanche für Parameterseiten und MIDI-Mappings am NT.</li>
+  </ul>

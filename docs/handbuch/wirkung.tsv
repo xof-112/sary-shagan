@@ -1,0 +1,36 @@
+# Parameter (Name wie im NT-Menü) <TAB> Wirkung (HTML erlaubt) – für den erzeugten Anhang
+Input level	Pegel vor dem Hall; das trockene Signal bleibt unberührt
+Pre-delay	Verzögerung, bevor der Hall einsetzt
+Diffuse input	vier Allpässe vor dem Tank: weicher, dichter Einsatz
+Diffusion	Dichte im Tank; wenig = Echos und Flattern hörbar
+Size	Raumgröße; im Tuned Mode Tonhöhe des Tanks
+Decay	Nachhallzeit; ganz rechts fast endlos
+Input filter	Klangfarbe vor dem Hall: Mitte aus, rechts Low cut, links High cut
+Dry/Wet	Überblendung trocken ↔ Hall, Mitte gleich laut
+Reverb filter	Filter im Tank, wirkt mit jedem Umlauf stärker
+Mod depth	Auslenkung der vier Tank-LFOs
+Mod rate	Tempo der LFOs (Anzeige: erster LFO)
+Mod shape	LFO-Form: fallende Rampe … Dreieck … steigende Rampe
+Freeze	hält den Hall unbegrenzt; Eingang läuft weiter hinein
+Freeze mode	Taste 3 und Freeze gate: halten (Momentary) oder umschalten (Latch)
+Clear	steigende Flanke löscht den Hall
+Tuned	Tank sehr kurz, Hall wird zum gestimmten Resonator
+Saturation	weiche Begrenzung ab 7,5 V statt harter bei 10 V
+In filter CV	±5 V = ganzer Weg von <i>Input filter</i>
+Diffusion CV	±5 V = ganzer Weg von <i>Diffusion</i>
+Size CV	±5 V = ganzer Weg von <i>Size</i>; im Tuned Mode 1 V/Okt.
+Dry/Wet CV	±5 V = ganzer Weg von <i>Dry/Wet</i>
+Rvb filter CV	±5 V = ganzer Weg von <i>Reverb filter</i>
+Pre-delay CV	±5 V = ganzer Weg von <i>Pre-delay</i>
+Mod depth CV	±5 V = ganzer Weg von <i>Mod depth</i>
+Mod rate CV	±5 V = ganzer Weg von <i>Mod rate</i>
+Mod shape CV	±5 V = ganzer Weg von <i>Mod shape</i>
+Decay CV	±5 V = ganzer Weg von <i>Decay</i>
+Freeze gate	Gate über 2 V: Freeze (je nach <i>Freeze mode</i>)
+Clear gate	steigende Flanke über 2 V: Clear
+Input L	Audio links
+Input R	Audio rechts; None = Input L auf beiden Seiten
+Output L	Ausgang links
+Output L mode	Add mischt auf den Bus, Replace ersetzt ihn
+Output R	Ausgang rechts
+Output R mode	Add mischt auf den Bus, Replace ersetzt ihn

@@ -1,0 +1,27 @@
+{
+  "slug": "3F4-SaryShagan",
+  "name": "Sary-Shagan",
+  "version": "2.1.0",
+  "license": "GPL-3.0-or-later",
+  "brand": "3F4",
+  "author": "3rdFloor4",
+  "authorEmail": "",
+  "authorUrl": "",
+  "pluginUrl": "https://github.com/xof-112/disting-nt-plugins",
+  "manualUrl": "https://github.com/xof-112/disting-nt-plugins/blob/main/sary-shagan/vcv/README.md",
+  "sourceUrl": "https://github.com/xof-112/disting-nt-plugins",
+  "donateUrl": "",
+  "changelogUrl": "",
+  "modules": [
+    {
+      "slug": "SaryShagan",
+      "name": "Sary-Shagan",
+      "description": "Dattorro plate reverb, port of Valley Plateau. The disting NT algorithm, natively in Rack.",
+      "tags": [
+        "Reverb",
+        "Effect",
+        "Stereo"
+      ]
+    }
+  ]
+}

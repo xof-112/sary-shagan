@@ -1,0 +1,20 @@
+# Build-Ergebnisse (ausgelieferte Dateien liegen in release/ und sind eingecheckt)
+plugins/
+test/host
+test/compare
+emu/*.dll
+emu/*.exe
+render/frames/
+vcv/build/
+vcv/dist/
+vcv/plugin.dll
+vcv/plugin.so
+vcv/plugin.dylib
+vcv/libRack*.a
+vcv/test/host_test
+vcv/test/preview
+vcv/test/frames.txt
+__pycache__/
+*.o
+!release/*.o
+vcv/dep/

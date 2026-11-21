@@ -1,0 +1,36 @@
+V	0.4	35
+P	Input	Input level	-inf dB … +2.5 dB	0.0 dB
+P	Input	Pre-delay	0 ms … 500 ms	0 ms
+P	Input	Diffuse input	Off · On	On
+P	Space	Diffusion	0.0 % … 100.0 %	100.0 %
+P	Space	Size	0.0 % … 100.0 %	50.0 %
+P	Space	Decay	0.0 % … 100.0 %	50.0 %
+P	Tone	Input filter	HC 110Hz … LC 3.52kHz	Off
+P	Tone	Dry/Wet	0.0 % … 100.0 %	50.0 %
+P	Tone	Reverb filter	HC 110Hz … LC 3.52kHz	Off
+P	Modulation	Mod depth	0.0 % … 100.0 %	5.0 %
+P	Modulation	Mod rate	0.10 Hz … 10.00 Hz	0.10 Hz
+P	Modulation	Mod shape	Ramp down … Ramp up	Triangle
+P	Modes	Freeze	Off · On	Off
+P	Modes	Freeze mode	Momentary · Latch	Momentary
+P	Modes	Clear	Off · On	Off
+P	Modes	Tuned	Off · On	Off
+P	Modes	Saturation	Off · On	On
+P	CV inputs	In filter CV	None … Aux 44	None
+P	CV inputs	Diffusion CV	None … Aux 44	None
+P	CV inputs	Size CV	None … Aux 44	None
+P	CV inputs	Dry/Wet CV	None … Aux 44	None
+P	CV inputs	Rvb filter CV	None … Aux 44	None
+P	CV inputs	Pre-delay CV	None … Aux 44	None
+P	CV inputs	Mod depth CV	None … Aux 44	None
+P	CV inputs	Mod rate CV	None … Aux 44	None
+P	CV inputs	Mod shape CV	None … Aux 44	None
+P	CV inputs	Decay CV	None … Aux 44	None
+P	CV inputs	Freeze gate	None … Aux 44	None
+P	CV inputs	Clear gate	None … Aux 44	None
+P	Routing	Input L	Input 1 … Aux 44	Input 1
+P	Routing	Input R	None … Aux 44	Input 2
+P	Routing	Output L	Input 1 … Aux 44	Output 1
+P	Routing	Output L mode	Add · Replace	Add
+P	Routing	Output R	Input 1 … Aux 44	Output 2
+P	Routing	Output R mode	Add · Replace	Add

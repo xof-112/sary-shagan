@@ -1,0 +1,7 @@
+[submodule "distingNT_API"]
+	path = distingNT_API
+	url = https://github.com/expertsleepersltd/distingNT_API.git
+[submodule "third_party/ValleyRackFree"]
+	path = third_party/ValleyRackFree
+	url = https://github.com/ValleyAudio/ValleyRackFree.git
+	shallow = true

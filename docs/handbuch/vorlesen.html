@@ -1,0 +1,180 @@
+<script>
+(function(){
+  var S = window.speechSynthesis;
+  var wrap = document.querySelector('.wrap'); if(!wrap) return;
+  var KEY = 'tts-pos:' + document.title;
+  function sget(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function sset(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+
+  // ---------- Text sammeln ----------
+  function clean(t){
+    return t.replace(/ /g,' ')
+      .replace(/↑ zum Inhalt/g,'')
+      .replace(/\s*↔\s*/g,' bis ').replace(/\s*→\s*/g,', dann ').replace(/\s*←\s*/g,', ')
+      .replace(/ · /g,', ').replace(/·/g,', ')
+      .replace(/≈\s*/g,'etwa ').replace(/≥\s*/g,'mindestens ').replace(/±/g,'plus minus ')
+      .replace(/−(?=\d)/g,'minus ').replace(/(\d)\s*–\s*(?=\d)/g,'$1 bis ').replace(/\s+–\s+/g,', ').replace(/–/g,' bis ')
+      .replace(/◀/g,'links').replace(/▶/g,'rechts').replace(/★/g,'Stern ')
+      .replace(/\s+/g,' ').trim();
+  }
+  function textOf(el, dropNested){
+    var c = el.cloneNode(true);
+    c.querySelectorAll('.tts-here, script, style, svg, img' + (dropNested ? ', ul, ol' : '')).forEach(function(n){ n.remove(); });
+    return clean(c.textContent || '');
+  }
+  function rowText(tr){
+    var cells = Array.prototype.slice.call(tr.children);
+    if(!cells.length || cells.every(function(c){ return c.tagName==='TH'; })) return '';
+    var table = tr.closest('table'), head = table && table.querySelector('tr');
+    var heads = head ? Array.prototype.slice.call(head.children).map(function(h){ return clean(h.textContent); }) : [];
+    var first = textOf(cells[0]);
+    var parts = [];
+    for(var i=1;i<cells.length;i++){
+      var v = textOf(cells[i]); if(!v) continue;
+      parts.push((heads[i] ? heads[i].toLowerCase()+': ' : '') + v);
+    }
+    if(!first) return parts.join('. ');
+    return first + (parts.length ? '. ' + parts.join('. ') : '');
+  }
+  function patchText(box){
+    var out=[], kids=box.children;
+    for(var i=0;i<kids.length;i+=2){ out.push(clean(kids[i].textContent)+': '+(kids[i+1]?textOf(kids[i+1]):'')); }
+    return out.join('. ');
+  }
+  var sel = 'header h1, header .lede, article h2, article h3, article h4, article p, article li, article tr, article .patch, article figcaption';
+  var items = [];
+  wrap.querySelectorAll(sel).forEach(function(el){
+    if(el.closest('nav, footer, .tts-bar')) return;
+    if(el.tagName==='P' && (el.closest('td') || el.closest('li'))) return;
+    if(el.tagName==='LI' && el.closest('td')) return;
+    if(el.tagName==='FIGCAPTION' && el.closest('td')) return;
+    var t;
+    if(el.tagName==='TR') t = rowText(el);
+    else if(el.classList.contains('patch')) t = patchText(el);
+    else if(el.tagName==='LI') t = textOf(el, true);
+    else t = textOf(el);
+    if(!t || t.length < 2) return;
+    if(/^H[234]$/.test(el.tagName)){
+      var num = el.tagName==='H2' && el.closest('.ph') ? el.closest('.ph').querySelector('.num') : null;
+      t = (num ? 'Kapitel ' + parseInt(num.textContent,10) + '. ' : '') + t + '.';
+    }
+    var art = el.closest('article');
+    items.push({el:el, text:t, art:art});
+  });
+  if(!items.length) return;
+
+  // ---------- Stimme ----------
+  var voice = null;
+  function pickVoice(){
+    if(!S) return;
+    var vs = S.getVoices() || [];
+    voice = vs.filter(function(v){ return /^de(-|_|$)/i.test(v.lang); })
+              .sort(function(a,b){ return (b.localService?1:0)-(a.localService?1:0); })[0] || null;
+  }
+  if(S){ pickVoice(); if('onvoiceschanged' in S) S.onvoiceschanged = pickVoice; }
+
+  // ---------- Leiste ----------
+  var bar = document.createElement('div');
+  bar.className='tts-bar'; bar.hidden=true; bar.setAttribute('role','region'); bar.setAttribute('aria-label','Vorlesen');
+  bar.innerHTML = '<div class="tts-in">'+
+    '<button type="button" id="tts-prev" aria-label="Vorheriger Absatz">⏮</button>'+
+    '<button type="button" id="tts-play" class="tts-play" aria-label="Abspielen">▶</button>'+
+    '<button type="button" id="tts-next" aria-label="Nächster Absatz">⏭</button>'+
+    '<button type="button" id="tts-chap" aria-label="Nächstes Kapitel">⏭⏭</button>'+
+    '<select id="tts-rate" aria-label="Tempo"><option value="0.8">0,8×</option><option value="1" selected>1×</option><option value="1.2">1,2×</option><option value="1.4">1,4×</option><option value="1.7">1,7×</option></select>'+
+    '<span class="tts-where" id="tts-where"></span>'+
+    '<button type="button" id="tts-close" aria-label="Vorlesen beenden">✕</button>'+
+    '<span class="tts-msg" id="tts-msg" hidden></span></div>';
+  document.body.appendChild(bar);
+  var $ = function(id){ return document.getElementById(id); };
+  var rate = parseFloat(sget('tts-rate')||'1'); $('tts-rate').value = String(rate);
+
+  var idx = 0, playing = false, chunks = [], ci = 0, token = 0;
+  function msg(t){ var m=$('tts-msg'); m.textContent=t||''; m.hidden=!t; }
+  function chapterName(it){
+    var h = it.art && it.art.querySelector('h2');
+    var n = it.art && it.art.querySelector('.num');
+    return h ? ((n ? n.textContent + ' ' : '') + clean(h.textContent)) : 'Einleitung';
+  }
+  function mark(){
+    document.querySelectorAll('.tts-on').forEach(function(e){ e.classList.remove('tts-on'); });
+    var it = items[idx]; if(!it) return;
+    it.el.classList.add('tts-on');
+    $('tts-where').textContent = chapterName(it);
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    try{ it.el.scrollIntoView({block:'center', behavior: reduce ? 'auto' : 'smooth'}); }catch(e){ it.el.scrollIntoView(); }
+    sset(KEY, String(idx));
+  }
+  function split(t){
+    var parts = t.match(/[^.!?;:]+[.!?;:]*\s*/g) || [t], out=[], cur='';
+    parts.forEach(function(p){
+      if((cur+p).length > 200 && cur){ out.push(cur); cur=p; } else cur+=p;
+    });
+    if(cur.trim()) out.push(cur);
+    // sehr lange Stücke ohne Satzzeichen an Kommas teilen
+    var res=[]; out.forEach(function(s){ while(s.length>260){ var k=s.lastIndexOf(',',240); if(k<80) k=240; res.push(s.slice(0,k+1)); s=s.slice(k+1);} res.push(s); });
+    return res.filter(function(s){ return s.trim(); });
+  }
+  function setPlayBtn(){ var b=$('tts-play'); b.textContent = playing ? '⏸' : '▶'; b.setAttribute('aria-label', playing ? 'Pause' : 'Abspielen'); }
+  function speakChunk(my){
+    if(my!==token || !playing) return;
+    if(ci >= chunks.length){
+      if(idx < items.length-1){ idx++; startItem(my); } else { playing=false; setPlayBtn(); msg('Ende des Handbuchs.'); }
+      return;
+    }
+    var u = new SpeechSynthesisUtterance(chunks[ci]);
+    u.lang = 'de-DE'; if(voice) u.voice = voice; u.rate = rate;
+    u.onend = function(){ if(my!==token) return; ci++; speakChunk(my); };
+    u.onerror = function(e){ if(my!==token) return; if(e && (e.error==='interrupted'||e.error==='canceled')) return; ci++; speakChunk(my); };
+    S.speak(u);
+  }
+  function startItem(my){
+    mark(); chunks = split(items[idx].text); ci = 0; speakChunk(my);
+  }
+  function play(){
+    if(!S || typeof SpeechSynthesisUtterance==='undefined'){ msg('Dieser Browser bietet hier keine Sprachausgabe an. Alternative: Android-Einstellungen → Bedienungshilfen → Vorlesen.'); return; }
+    msg(''); if(!voice) pickVoice();
+    S.cancel(); playing = true; token++; setPlayBtn(); startItem(token);
+    setTimeout(function(){ if(playing && S && !S.speaking && !S.pending){ msg('Es kommt kein Ton? Dann blockiert die Ansicht die Sprachausgabe. Alternative: Android-Einstellungen → Bedienungshilfen → Vorlesen.'); } }, 2500);
+  }
+  function stop(){ playing=false; token++; if(S) S.cancel(); setPlayBtn(); }
+  function open(){ bar.hidden=false; document.body.classList.add('tts-open'); }
+  function goto(i, autoplay){ idx = Math.max(0, Math.min(items.length-1, i)); open(); if(autoplay || playing) play(); else mark(); }
+
+  $('tts-play').onclick = function(){ if(playing) stop(); else play(); };
+  $('tts-prev').onclick = function(){ goto(idx-1); };
+  $('tts-next').onclick = function(){ goto(idx+1); };
+  $('tts-chap').onclick = function(){
+    var cur = items[idx].art;
+    for(var i=idx+1;i<items.length;i++){ if(items[i].art!==cur){ goto(i); return; } }
+  };
+  $('tts-rate').onchange = function(){ rate = parseFloat(this.value)||1; sset('tts-rate', String(rate)); if(playing) play(); };
+  $('tts-close').onclick = function(){ stop(); bar.hidden=true; document.body.classList.remove('tts-open'); document.querySelectorAll('.tts-on').forEach(function(e){ e.classList.remove('tts-on'); }); };
+
+  // ---------- Startknöpfe ----------
+  var saved = parseInt(sget(KEY)||'',10);
+  var hdr = document.querySelector('header');
+  if(hdr){
+    var b = document.createElement('button'); b.type='button'; b.className='tts-start';
+    b.textContent = '▶ Vorlesen';
+    b.onclick = function(){ goto(0, true); };
+    var p = document.createElement('div'); p.appendChild(b);
+    if(saved>0 && saved<items.length){
+      var r = document.createElement('button'); r.type='button'; r.className='tts-start'; r.style.marginLeft='8px';
+      r.textContent = '▶ Weiter bei ' + chapterName(items[saved]).slice(0,28);
+      r.onclick = function(){ goto(saved, true); };
+      p.appendChild(r);
+    }
+    hdr.appendChild(p);
+  }
+  document.querySelectorAll('article .ph-main').forEach(function(ph){
+    var art = ph.closest('article');
+    var first = -1; for(var i=0;i<items.length;i++){ if(items[i].art===art){ first=i; break; } }
+    if(first<0) return;
+    var b = document.createElement('button'); b.type='button'; b.className='tts-here'; b.textContent='▶ Ab hier vorlesen';
+    b.onclick = function(){ goto(first, true); };
+    ph.appendChild(b);
+  });
+  document.addEventListener('visibilitychange', function(){ if(document.hidden && playing && S && S.paused){ stop(); } });
+})();
+</script>
